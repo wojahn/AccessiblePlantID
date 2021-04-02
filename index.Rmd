@@ -11,7 +11,7 @@ output:
     theme: flatly
     self_contained: true
 link-citations: yes
-fontsize: 12pt
+fontsize: 20pt
 urlcolor: blue
 csl: AmJBot.csl
 bibliography: References.bib
@@ -129,9 +129,3 @@ Squish the flower to find the flower’s ovary (a bulge).  Once it has been loca
 True floral symmetry is difficult to determine without being able to see the petal coloration, though whether or not a flower is zygomorphic or peloric may be crudely estimated by feeling the general shape of the flower.
 
 © 2019 Wojahn and Wojahn
-Licensed under the GNU AGPL v. 3 License
-
-<center>
-[![TaBP](./100px-AGPLv3_Logo.svg.png "TaBP")]()
-</center>
-

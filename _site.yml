@@ -1,7 +1,9 @@
 name: "Accessible PLant Identification"
 output_dir: "."
 navbar:
-  title: "Accessible PLant Identification"
+  title: "Accessible Plant Identification"
   left:
     - text: "Main"
       href: index.html
+    - text: "License"
+      href: License.html
