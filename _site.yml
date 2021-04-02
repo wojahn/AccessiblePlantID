@@ -1,11 +1,7 @@
-name: "ReproChecklist"
+name: "Accessible PLant Identification"
 output_dir: "."
 navbar:
-  title: "ReproChecklist"
+  title: "Accessible PLant Identification"
   left:
-    - text: "Pipeline"
+    - text: "Main"
       href: index.html
-    - text: "Funding"
-      href: Funding.html
-    - text: "License"
-      href: License.html

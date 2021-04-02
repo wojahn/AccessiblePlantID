@@ -1,14 +1,14 @@
 ---
-title: "Reprochecklist"
-author: "J. M. A. Wojahn, Felix Forest, Martin W. Callmander, and Sven Buerki"
-date: "`r Sys.Date()`"
+title: "Accessible Plant Identification for People with Visual Impairment"
+author: "John M. A. Wojahn, Patricia M. Wojahn"
+date: "2019"
 output:
 #  bookdown::pdf_document2:
 #    toc: TRUE
   bookdown::html_document2: 
     toc: TRUE
     toc_float: TRUE
-    theme: cerulean
+    theme: flatly
     self_contained: true
 link-citations: yes
 fontsize: 12pt
@@ -22,8 +22,6 @@ editor_options:
 
 ```{js logo-js, echo=FALSE}
 $(document).ready(function() {
-  $('#header').parent().prepend('<div id=\"logo\"><img src=\"ReprochecklistLogo.jpg\" style=\"position:absolute; top:0; right:0; padding:10px; height:200px\"></div>');
-  $('#header').css('margin-right', '120px')
 });
 ```
 
@@ -50,206 +48,90 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-# Data Availability
+# Nervation
 
-The input data (all tracheophyta restricted to only those with a physical specimen with GPS coordinates) can be accessed directly from GBIF:
+(i.e. Leaf Rib Pattern)
 
-[Click Here to See GBIF Data](https://doi.org/10.15468/dl.b3bvpw)
+Lightly stroke the leaf from bottom to apex, noting when the primary nerve branches.  If it branches immediately from the petiole, count the number of branches (3 for triplinerve vs 5 for palmate). If there is only one nerve, feel for secondary nerves using two fingers: one placed on the main nerve and one tracing the path of a branching nerve from midrib to margin.  Using two fingers allows for easier detection of curvature in the branched nerves (no curvature for parallel vs curvature for penninerve).  If one cannot feel anything other than the center nerve the leaf is reticulate.  
 
-The 2021 ReproChecklist can be downloaded in the link below:
+# Composite vs. Simple Leaf
 
-[Click Here to Get 2021 ReproChecklist](10.6084/m9.figshare.13720318)
+(i.e. One Big Leaf vs Many Small Leaflets on a Stalk)
 
-A folder of intermediate files can be downloaded in the link below:
+To identify whether a leaf is simple or composite, run one’s finger down the primary venation of a leaf/leaflet, then down the cylinder to which the leaf/leaflet is attached.  If the leaf is compound, the first cylinder one feel will feel distinctly different from the second cylinder one feel (the branch), and one will also be able to feel the insertion point of the first cylinder into the second as a swelling. To determine type of composite leaf run one’s finger up the rachis to the apex, noting whether or not a terminal leaflet is present (imparipinnate vs paripinnate)
 
-[Click Here to Get Intermediate Data](https://drive.google.com/drive/folders/1pIzb27PKIq0_iA2Lz0p7vjTvPWISEkXQ?usp=sharing)
+# Phyllotaxy
 
-# Package Availability
-You can download the *ReproChecklist* package from GitHub using the install_github package from devtools
-```{r, eval = FALSE}
-install.packages("devtools")
-devtools::install_github("wojahn/ReproChecklist")
-```
+(i.e. Whether the Leaves Are Across From Each Other Or Alternate on Branch)
 
-# Preprocess raw GBIF file into smaller files
-After downloading GBIF raw file we need to preprocess it so that we can work within the confines of 16 GB RAM
+Run one’s fingers along a branch and feel the insertion points of each leaf.  Do this for at least 3 leaves (across from each other means opposite whereas not across from each other means alternate).
 
-```{r, eval = FALSE}
-# Make intermediate
-#Make intermediate
-system("cut  -f 1,6,9,10,22,23,33,41,45 0160938-200613084148143.csv > GBIF_Traceophyta_2021Small.tab")
-#Move original to external drive or delete it to conserve memory
-#From intermediate make singles
-system("cut  -f 1 GBIF_Traceophyta_2021Small.tab > gbifID.tab")
-system("cut  -f 2 GBIF_Traceophyta_2021Small.tab > class.tab")
-system("cut  -f 3 GBIF_Traceophyta_2021Small.tab > genus.tab")
-system("cut  -f 4 GBIF_Traceophyta_2021Small.tab > species.tab")
-system("cut  -f 5 GBIF_Traceophyta_2021Small.tab > dLat.tab")
-system("cut  -f 6 GBIF_Traceophyta_2021Small.tab > dLong.tab")
-system("cut  -f 7 GBIF_Traceophyta_2021Small.tab > year.tab")
-system("cut  -f 8 GBIF_Traceophyta_2021Small.tab > IDdBy.tab")
-system("cut  -f 9 GBIF_Traceophyta_2021Small.tab > RecrdedBy.tab")
-system("cut  -f 1,7 GBIF_Traceophyta_2021Small.tab > gbifYearandID.tab")
-system("cut  -f 1,4 GBIF_Traceophyta_2021Small.tab > IDandSpp.tab")
-system("cut  -f 1,46 0160938-200613084148143.csv > IDandType.tab")
-```
+# Leaf Orientation
 
-# Inferring raw hotspot species list
-We downloaded occurrence data for Tracheophytes (vascular plants) with physical specimens from GBIF on 8 September 2020 (GBIF, 2020).  A database of species occurring in the 36 BHs was inferred by the function HotspotOverlappeR using overlapping points derived from GBIF GPS data with shapefiles of the 36 hotspots (CEPF, 2016). The names of the hotspot(s) in which each taxon occurred were also recorded by the function. HotspotOverlappeR used maptools (Bivand et al., 2019) and sp (Pebesma et al., 2005).
+(i.e. How Are the Leaves Orientated with Respect to Their Peers)
 
-```{r, eval = FALSE}
-# Read in coordinate data, GBIF IDs, and species
-GBIFlat <- read.delim("dLat.tab", sep = "\t")
-GBIFlong <- read.delim("dLong.tab", sep = "\t")
-GBIFidspp <- read.delim("IDandSpp.tab",sep="\t") #bc spp sometimes has tabs between them
-# Make file for overlapping
-ForOverlapping <- data.frame(GBIFidspp,GBIFlat,GBIFlong)
-# Destroy old variables to conserve RAM
-rm(c(GBIFidspp,GBIFlat,GBIFlong))
-gc()
-# Overlap with hotspots shapefile
-HotspotsSpp <- ReproChecklist::HotspotOverlappeR(ForOverlapping)
-write.csv(HotspotsSpp,"HotspotSpp.csv",row.names=F)
-# Restrict to only species in hotspots
-TrueHotspotSpp <- HotspotsSpp[!is.na(HotspotsSpp$InHotspot),]
-write.csv(TrueHotspotSpp,"TrueHotspotSpp.csv",row.names=F)
-# Remove old variables to conserve memory
-rm(HotspotsSpp)
-gc()
+If using fresh specimens make sure that one does not bed the leaves as one feels them, just gently pinch the the air around the branch of interest, noting the natural orientation of each leaf.  Do this for at least 3 leaves (spiral vs verticillate (in separate whorls) vs planar vs, decussate (in alternating pairs).  To identify leaf orientation using herbarium specimens, one must rely on feeling the petioles for evidence of torsion. 
 
-```
+# Leaf Margin
 
-# Curate taxonomy
-This database was then taxonomically curated using the TPL_Synonym_CheckeR, WFO_Synonym_CheckR and TaxonomyHarmonizeR functions from our package Geochecklist.  Taxonomical curation prioritized the nomenclature of the more recently updated World Flora Online (WFO, 2020) while using the more comprehensive (but older) The Plant List (TPL, 2013) for taxa not in the WFO.
+Gently run one’s finger along the leaf edge to feel for dentition/undulation.  If one feels something other than smooth edges, first note whether the edges feel pointy (some sort of toothedness) or rounded (crenate for small lobes, lobate for larger ones), then draw one’s fingertip from right to left then left to right.  Note if there is a difference in texture (dentate teeth point outward and do not feel different if brushed from different directions vs serrate which has a directionality like a knife).  Next use one’s fingernail to feel for smaller teeth between the teeth (each tooth is a ‘catch’ in the nail’s track) to check for double serration.
 
-```{r, eval = FALSE}
-# Make unique list of all species-level occurrences
-UniqueHSpp <- unique(as.vector(TrueHotspotSpp$Species))
-# Remove non-BH occurrences
-UniqueHSpp <- UniqueHSpp[!UniqueHSpp == ""]
-# Compare taxonomy with The Plant List
-TPL_Curated <- ReproChecklist::TPL_Synonym_CheckeR(as.character(UniqueHSpp))
-write.csv(TPL_Curated,"TPL_Curated.csv",row.names = F)
-# Compare taxonomy with World Flora Online
-WF_Curated <- ReproChecklist::WFO_Synonym_CheckeR(as.character(UniqueHSpp))
-write.csv(WF_Curated,"WF_Curated.csv",row.names = F)
-# Harmonize taxonomy between TPL and WFO, prioritizing WFO
-CuratedHSpp <- ReproChecklist::TaxonomyHarmonizeR(TPL_Curated, WF_Curated, UniqueHSpp)
-write.csv(CuratedHSpp,"CuratedHSpp.csv",row.names = F)
-# Now apply this harmonized taxonomical framework to GBIF species
-UpdatedGBIFHSpp <- ReproChecklist::GBIFTaxonomicalHarmonizeR(TrueHotspotSpp,CuratedHSpp)
-# Update column name
-colnames(UpdatedGBIFHSpp)[6] <- "GBIF_ID"
-write.csv(UpdatedGBIFHSpp,"UpdatedGBIFHSpp.csv",row.names=F)
-# Remove occurrences with empty taxonomical information
- ReproChecklist <- as.data.frame(UpdatedGBIFHSpp[!UpdatedGBIFHSpp$Species == "",])
- write.csv(ReproChecklist,"ReproChecklist.csv",row.names=F)
-```
+# Hairy vs. Glabrous
 
+Caress the axial (top) and abaxial (bottom) surface of each leaf, feeling for hair with one’s most sensitive finger.  Alternatively, one can use the lips to feel the leaf texture.
 
-# Calculate number of collections per species, number of collections total, and skewness statisitics as well as number of species unique to each hotspot
+# Leaf Shape
 
-The number of species in each BH was inferred using the function HotspotSpeciesCounteR using the outputs of HotspotOverlappeR and TaxonomyHarmonizeR. It also inferred the number of total collections per hotspot, the median number of collections per species in each hotspot, the standard deviation of the number of collections per species in each hotspot, and the Pearson’s moment coefficient of skewness of the number of collections per species in each hotspot. It used EnvStats internally (Millard, 2013). The percent of species unique to each hotspot was calculated by SharedSpeciesInferreR.
+First feel the primary nerve from base to tip to get a sense of the length of the leaf.  Then, starting from the base and working one’s way up to the apex, trace the leaf shape with the index and thumb.  Ovate leaves are longer than they are wide, in other words they are ovals.  Deltoid leaves are pyramid shaped.  Cordate leaves are heart shaped.  Reniform leaves are kidney shaped.  Round leaves are roughly circular. Elliptic leaves are long ovals.  Linear leaves are much longer than elliptic leaves.  Obdeltoid leaves are oval but with a fat bottom. Obdelliptic leaves are the opposite of obdeltoid leaves: they are oval but with a fatter head.
 
-```{r, eval = FALSE}
-out <- ReproChecklist::HotspotSpeciesCounteR(ReproChecklist)
-write.csv(out,"HotspotSppInfo.csv",row.names=F)
-SharedSpecies <- ReproChecklist::SharedSpeciesInferreR(ReproChecklist)
-write.csv(SharedSpecies,"SharedSpecies.csv",row.names=F)
-```
+# Trunk Shape
 
+Start from the base of the tree and feel around its circumference, noting any bulging or buttressing.  If several smaller trunks emanate from the ground towards a central point, then the tree has prop roots.  This method is for in situ specimens, as trunks generally are not preserved as herbarium specimens.
 
-# Extract year of description using IPNI
-	
-Next we extracted the dates of description for each of the species in the curated list as well as for names that were eliminated during curation was done using the function IPNI_Description_Date_GetteR.  This function used taxize (Chamberlain et al., 2013) internally.  If a taxon in the curated list was not in IPNI but its synonym was, then its synonym’s date of description was used as its date of description.  If multiple dates were returned the earliest date was used as the date of description. This process was done by the functions IPNITaxonomyHarmonizeR and IPNICleaneR in our package.
-```{r, eval = FALSE}
-# Make unique vector of all hotspot species
-AllHSpp <- unique(as.vector(c(as.character(CuratedHSpp$AcceptedName),as.character(CuratedHSpp$OldName))))
-# Set entrez key (this one is depreciated, use your personal key)
-rentrez::set_entrez_key("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-# Get description dates
-IPNIyears <- ReproChecklist::IPNI_Description_Date_GetteR(as.character(AllHSpp))
-write.csv(IPNIyears,"IPNIyears.csv",row.names=F)
-# Harmonize IPNI taxonomy with curated list
-FinalIPNI <- ReproChecklist::IPNITaxonomyHarmonizeR(IPNIyears,CuratedHSpp)
-write.csv(FinalIPNI,"FinalIPNI.csv", row.names=F)
-# Do some stats
-length(which(FinalIPNI$DescriptionYear == "NOT_IN_IPNI"))
-UniqueAccepteds <- unique(as.vector(CuratedHSpp$AcceptedName))
-length(UniqueAccepteds)
-```
+# Latex (fresh only)
 
+For in situ testing make a cut into the flesh of the plant and wait a few seconds.  Using a gloved finger touch the cut area and with one’s thumb.  Press the thumb and forefinger together then slowly pull them apart.  If there is resistance and the feeling of a sticky stringiness between one’s fingers, then latex is present. 
 
-# Make collection and description yearly curves
+# Branching Pattern
 
-Then we analysed the GBIF collection year data for all of the hotspot species by constructing curves illustrating the number of collections per year.  The same process was done for the IPNI year-of-description data, where the curve showed the number of descriptions per year.  The function YearlyCollectionDescriptionPlotsMakeR performed this analysis for the overall data and coplotted the 2 resultant curves.  Regressions were run on the collection and description data from 2009 to 2020 for collections and descriptions using RegressionPerformeR.
+Start from the base and work one’s way up as far as one can reach.  If branching occurs above where one can safely reach use a long bamboo pole to feel where branching occurs.  If a tree is exceptionally tall or is in a forest where most of the branches are high up in the canopy this method may not work.
 
-```{r, eval = FALSE}
-#set output directory if want it to be different than pwd
-ID_Year <- read.delim("gbifYearandID.tab", sep = "\t")
-ReproChecklist::YearlyCollectionDescriptionCurvesMakeR(ReproChecklist,FinalIPNI,ID_Year)
+# Thorns
 
-```
+Whenever feeling an unknown plant for the first time without the presence of a sighted assistant be sure to gently approach it in slow, light caresses, feeling for thorns with one’s least important finger.
 
-Here are the yearly collection and description curves (blue is collection, orange is description, dotted is genus-only collections):
+# Lenticelles
+
+(i.e. Little Rough/Raised Spots On Bark)
+
+Lenticelles can be felt for by gently caressing the bark with one’s fingertips or fingernails.  One’s lips may also be used to feel for especially small/shallow lenticelles.
+
+# Petal Number
+
+Count the petals from the top in a clockwise direction, keeping the first petal grasped between one’s left forefinger and thumb.
+
+# Placentation
+
+(i.e. Arrangement Of The Plant’s Placentae, for Advanced Users)
+
+If the sample is large and fresh one may be able to cut the ovary open and feel around with one’s fingertips.  If the sample is small or pressed, it may not be possible to identify this character using touch.
+
+# Position of Ovary
+
+(Whether Ovary Swelling is Below, Halfway Through, or Within Flower Cup, for Advanced Users)
+
+Squish the flower to find the flower’s ovary (a bulge).  Once it has been located gently feel the flower whorl: if the base of the whorl is below the swelling, then the flower is hypogynous.  If the whorl attaches to a tube that then attaches to the bulb, the flower is perigynous.  If the whorl is attached to the top of the swelling, the flower is epigynous. 
+
+# Floral Symmetry
+
+(i.e. is the flower symmetrical?)
+
+True floral symmetry is difficult to determine without being able to see the petal coloration, though whether or not a flower is zygomorphic or peloric may be crudely estimated by feeling the general shape of the flower.
+
+© 2019 Wojahn and Wojahn
+Licensed under the GNU AGPL v. 3 License
 
 <center>
-[![CDC](./OverallYearlyCollectionDescriptionCurves.jpg "CDC")]()
+[![TaBP](./100px-AGPLv3_Logo.svg.png "TaBP")]()
 </center>
 
-# Make hotspotwise heatmaps
-Heatmaps of collection activity and description activity were generated using HeatmapMakeR.  This function used gplots (Gregory et al., 2020) internally to create the heatmap and perform the clustering analyses. Labels were colored using visual inspection of clusters.  Colrownumz and Descrownumz can be added to add group prefixes to the graph. They have the same order as would unique(UpdatedGBIFHSpp$HotspotName) as their first column and the group membership as a number in the second column.
-
-```{r, eval = FALSE}
-# Preprocess IPNI results
-IPNIReady <- ReproChecklist::IPNIReadieR(FinalIPNI)
-write.csv(IPNIReady,"IPNIReady.csv",row.names=F)
-# For first time set to null then add cluster order if desired
-Colrownumz <- NULL
-Descrownumz <- NULL
-# Set output directory if want it to be different than pwd
-OutDirectory <- getwd()
-# Make collection and description heatmaps
-ReproChecklist::HeatmapMakeR(IPNIReady,ReproChecklist,OutDirectory,Colrownumz,Descrownumz, ID_Year = ID_Year))
-```
-
-Here is the collections heatmap:
-
-<center>
-[![ColBH](./CollectionsHM.png "ColBH")]()
-</center>
-
-Here is the description heatmap:
-
-<center>
-[![DescBH](./DescriptionsHM.png "DescBH")]()
-</center>
-
-# Perform decision tree analysis
-
-In order to calculate the levels of the Linnaean and Wallacean shortfalls for each GSB vascular plant species in each BH by running their ReproChecklist occurrences through a decision tree analysis.
-	
-```{r, eval = FALSE}
-#Perform EOO and AOO analyses for each species for each BH
-combo <- ReproChecklist::EOO_AOO_AnalyzeR(ReproChecklist,
-                                          MinArea = 100,
-                                          MinColl = 5, 
-                                          AEp = 0.2,
-                                          CellDistThresh = 10
-                                          samplesize = 500)
-
-#Construct the decision tree proper
-Tree <- ReproChecklist::DecisionTreeMakeR(combo)
-library(DiagrammeR)
-plot(myproj,layout="lay")
-#save as image manually
-```
-
-# Here is the decision tree:
-
-<center>
-[![DT](./DecisionTree.png "DT")]()
-</center>
-
-# Thank you!
-## © 2021 Wojahn, Forest, Callmander, and Buerki
