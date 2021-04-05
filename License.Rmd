@@ -7,7 +7,7 @@ output:
   bookdown::html_document2: 
     toc: TRUE
     toc_float: TRUE
-    theme: cerulean
+    theme: flatly
 link-citations: yes
 fontsize: 12pt
 urlcolor: blue
@@ -30,14 +30,14 @@ G2PMineR is released under the GNU Aferro General Public License v. 3
 The text of the license can be found at https://opensource.org/licenses/GPL-3.0. The text of the AGPL v. 3 can also be found below.
 
 
-## GNU AFFERO GENERAL PUBLIC LICENSE
-### Version 3, 19 November 2007
+# GNU AFFERO GENERAL PUBLIC LICENSE
+## Version 3, 19 November 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
-### Preamble
+## Preamble
 
   The GNU Affero General Public License is a free, copyleft license for
 software and other kinds of works, specifically designed to ensure
@@ -88,7 +88,7 @@ this license.
   The precise terms and conditions for copying, distribution and
 modification follow.
 
-### TERMS AND CONDITIONS
+## TERMS AND CONDITIONS
 
   0. Definitions.
 
